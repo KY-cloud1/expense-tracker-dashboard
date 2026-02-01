@@ -1,0 +1,18 @@
+<div *ngIf="userSpending">
+  <h1>User Spending</h1>
+  <p>Year-to-date: {{ userSpending.spending_ytd | currency }}</p>
+  <p>Monthly: {{ userSpending.spending_month | currency }}</p>
+  <p>Miscellaneous: {{ userSpending.misc_spending_month | currency }}</p>
+
+  <h2>Cards</h2>
+  <ul>
+    <li *ngFor="let card of userSpending.cards">
+      {{ card.name }} - {{ card.spending | currency }} / {{ card.limit | currency }}
+      <img [src]="card.imageUrl" alt="{{ card.name }}" width="200">
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="!userSpending">
+  Loading user spending...
+</div>
