@@ -27,7 +27,7 @@ export class UserSpendingDataService {
         let totalCardSpendYtd = 0;
 
         // Convert the 'cards' objects into an array of Card instances safely.
-        const cards: Card[] = Object.entries(data.cards)
+        const cardsArray: Card[] = Object.entries(data.cards)
           .filter((entry): entry is [string, CardData] => {
             const [key, card_data] = entry;
             return (
@@ -49,6 +49,12 @@ export class UserSpendingDataService {
             );
           });
 
+        // Convert cardsArray to dictionary.
+        const cardsDict: Record<string, Card> = {};
+        cardsArray.forEach(card => {
+          cardsDict[card.key] = card;
+        });
+
         const miscSpend = data.misc_spending
         const totalSpendYtd = totalCardSpendYtd + miscSpend
 
@@ -61,7 +67,7 @@ export class UserSpendingDataService {
           totalSpendYtd,
           monthlySpend,
           miscSpend,
-          cards
+          cardsDict
         );
       })
     );
@@ -70,6 +76,20 @@ export class UserSpendingDataService {
   updateMiscSpending(newMiscSpending: number): Observable<UserSpending> {
     return this.http.patch<UserSpending>(this.baseUrl, {
       misc_spending: newMiscSpending,
+    });
+  }
+
+  updateCardSpending(cards: Record<string, Card>): Observable<UserSpending> {
+    return this.http.patch<UserSpending>(
+      this.baseUrl, {
+      cards,
+    });
+  }
+
+  updateCardLimit(cards: Record<string, Card>): Observable<UserSpending> {
+    return this.http.patch<UserSpending>(
+      this.baseUrl, {
+      cards,
     });
   }
 }

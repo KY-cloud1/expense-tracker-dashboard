@@ -5,6 +5,6 @@ export class UserSpending {
         public spending_ytd: number,
         public spending_month: number,
         public misc_spend: number,
-        public cards: Card[]
-    ) {}
+        public cards: Record<string, Card>
+    ) { }
 }

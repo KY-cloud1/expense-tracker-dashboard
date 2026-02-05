@@ -17,11 +17,19 @@
 <div class="cards-stats">
     <h1>Cards</h1>
     <ul class="cards-container">
-        @for (card of userSpending.cards; track card.name) {
+        @for (card of cardList; track card.name) {
         <li class="card">
             <img [ngSrc]="card.imageUrl" alt="{{ card.name }}" width="300" height="200">
             <p>{{ card.name }}</p>
-            <p>{{ card.spending | currency }} / {{ card.limit | currency }}</p>
+            <p>{{ cardSpendingDisplay(card) | currency }} / {{ cardLimitDisplay(card) | currency }}</p>
+
+            <input type="text" [formControl]="cardControls[card.key].spending" placeholder="Update card spending" />
+            <button type="button" (click)="handleCardCancel(card)">Cancel</button>
+            <button type="button" (click)="handleCardSpendSubmit(card)">Update</button>
+
+            <input type="text" [formControl]="cardControls[card.key].limit" placeholder="Update card limit" />
+            <button type="button" (click)="handleCardCancel(card)">Cancel</button>
+            <button type="button" (click)="handleCardLimitSubmit(card)">Update</button>
         </li>
         }
     </ul>
