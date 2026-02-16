@@ -1,4 +1,4 @@
-# Angular Expense Tracker
+# Expense Tracker Dashboard
 
 A lightweight expense-tracking dashboard built with Angular. This project tracks year-to-date spending, average monthly spending, credit card usage, and miscellaneous expenses using a simple REST backend.
 
