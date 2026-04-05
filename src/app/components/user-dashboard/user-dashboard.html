@@ -30,6 +30,7 @@
             <input type="text" [formControl]="cardControls[card.key].limit" placeholder="Update card limit" />
             <button type="button" (click)="handleCardCancel(card)">Cancel</button>
             <button type="button" (click)="handleCardLimitSubmit(card)">Update</button>
+            <button type="button" (click)="handleCardPaid(card)" class="pay-card-btn">Pay Card</button>
         </li>
         }
     </ul>

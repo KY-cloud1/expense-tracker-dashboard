@@ -27,3 +27,21 @@
 .cards-stats {
   margin-bottom: 2.5rem;
 }
+
+.pay-card-btn {
+  display: block;
+  margin: 12px auto 0;
+  padding: 10px 24px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.pay-card-btn:hover {
+  background-color: #45a049;
+}
