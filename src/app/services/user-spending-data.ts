@@ -28,6 +28,22 @@ export class UserSpendingDataService {
     return new UserSpending(totalSpendYtd, avgMonthlySpend, miscSpendYtd, cardsDict);
   }
 
+  private sanitizeCards(cards: Record<string, Card>): Record<string, object> {
+    // Remove Angular FormControl internals and other class properties
+    // from being inserted into db.json.
+    const sanitized: Record<string, object> = {};
+    Object.entries(cards).forEach(([key, card]) => {
+      sanitized[key] = {
+        key: card.key,
+        name: card.name,
+        spending: card.spending,
+        limit: card.limit,
+        imageUrl: card.imageUrl
+      };
+    });
+    return sanitized;
+  }
+
   getUserSpendingSummary(): Observable<UserSpending> {
     return this.http.get<any>(this.baseUrl).pipe(
       map(data => this.mapToUserSpending(data))
@@ -42,20 +58,20 @@ export class UserSpendingDataService {
 
   updateCardSpending(cards: Record<string, Card>, newTotalYtd: number): Observable<UserSpending> {
     return this.http.patch<any>(this.baseUrl, {
-      cards: cards,
+      cards: this.sanitizeCards(cards),
       total_spending_ytd: newTotalYtd
     }).pipe(map(data => this.mapToUserSpending(data)));
   }
 
   updateCardLimit(cards: Record<string, Card>): Observable<UserSpending> {
     return this.http.patch<any>(this.baseUrl, {
-      cards: cards
+      cards: this.sanitizeCards(cards)
     }).pipe(map(data => this.mapToUserSpending(data)));
   }
 
   payCard(cards: Record<string, Card>): Observable<UserSpending> {
     return this.http.patch<any>(this.baseUrl, {
-      cards: cards
+      cards: this.sanitizeCards(cards)
     }).pipe(map(data => this.mapToUserSpending(data)));
   }
 }
