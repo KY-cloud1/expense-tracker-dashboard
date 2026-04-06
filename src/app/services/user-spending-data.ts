@@ -4,6 +4,11 @@ import { map, Observable } from 'rxjs';
 import { UserSpending } from '../models/user-spending';
 import { Card } from '../models/card';
 
+/**
+ * Service responsible for fetching and updating user spending data.
+ * Communicates with a local JSON server (json-server) via HTTP.
+ * All methods return Observables of UserSpending, mapped from the raw API response.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -13,9 +18,14 @@ export class UserSpendingDataService {
 
   constructor(private http: HttpClient) { }
 
+  /**
+   * Maps a raw API response object to a UserSpending instance.
+   * Computes the average monthly spend based on the current month of the year.
+   */
   private mapToUserSpending(data: any): UserSpending {
     const cardsDict: Record<string, Card> = {};
     Object.entries(data.cards).forEach(([key, card_data]: [string, any]) => {
+      // Only map entries that have the minimum required card fields.
       if (card_data && 'name' in card_data && 'spending' in card_data) {
         cardsDict[key] = new Card(key, card_data.name, card_data.spending, card_data.limit, card_data.imageUrl);
       }
@@ -28,9 +38,11 @@ export class UserSpendingDataService {
     return new UserSpending(totalSpendYtd, avgMonthlySpend, miscSpendYtd, cardsDict);
   }
 
+  /**
+   * Strips any class-specific properties from Card instances before sending
+   * to the API, ensuring only plain data fields are persisted to db.json.
+   */
   private sanitizeCards(cards: Record<string, Card>): Record<string, object> {
-    // Remove Angular FormControl internals and other class properties
-    // from being inserted into db.json.
     const sanitized: Record<string, object> = {};
     Object.entries(cards).forEach(([key, card]) => {
       sanitized[key] = {
@@ -44,12 +56,14 @@ export class UserSpendingDataService {
     return sanitized;
   }
 
+  /** Fetches the full user spending summary from the API. */
   getUserSpendingSummary(): Observable<UserSpending> {
     return this.http.get<any>(this.baseUrl).pipe(
       map(data => this.mapToUserSpending(data))
     );
   }
 
+  /** Updates the miscellaneous spending and total YTD values. */
   updateMiscSpending(newMiscSpending: number, newTotalYtd: number): Observable<UserSpending> {
     return this.http.patch<any>(this.baseUrl, {
       misc_spending_ytd: newMiscSpending,
@@ -57,6 +71,7 @@ export class UserSpendingDataService {
     }).pipe(map(data => this.mapToUserSpending(data)));
   }
 
+  /** Updates the spending value for one or more cards and the total YTD. */
   updateCardSpending(cards: Record<string, Card>, newTotalYtd: number): Observable<UserSpending> {
     return this.http.patch<any>(this.baseUrl, {
       cards: this.sanitizeCards(cards),
@@ -64,12 +79,14 @@ export class UserSpendingDataService {
     }).pipe(map(data => this.mapToUserSpending(data)));
   }
 
+  /** Updates the spending limit for one or more cards. */
   updateCardLimit(cards: Record<string, Card>): Observable<UserSpending> {
     return this.http.patch<any>(this.baseUrl, {
       cards: this.sanitizeCards(cards)
     }).pipe(map(data => this.mapToUserSpending(data)));
   }
 
+  /** Resets the spending value to 0 for one or more cards, simulating a payment. */
   payCard(cards: Record<string, Card>): Observable<UserSpending> {
     return this.http.patch<any>(this.baseUrl, {
       cards: this.sanitizeCards(cards)
